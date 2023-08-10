@@ -114,9 +114,9 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink to={"/authentication"} className="link">
+              <NavLink to={"/demo"} className="link">
                 <BsPerson size={23} className="min-w-max" />
-                Authentication
+                Demo
               </NavLink>
             </li>
             <li>

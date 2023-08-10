@@ -350,13 +350,16 @@ const mutateRow = useFakeMutation();
       <Button onClick={handleSaveConfirmed}>Yes</Button>
     </DialogActions>
   </Dialog> */}
-       <ConfirmationDialog
+          {pendingSaveRowId !== null && (
+      <ConfirmationDialog
         open={showConfirmationDialog}
         onClose={() => setShowConfirmationDialog(false)}
         onConfirm={handleSaveConfirmed}
         id={pendingSaveRowId}
         message="Are you sure you want to update this record?"
       />
+    )}
+
 
 
     </Box>

@@ -1,0 +1,43 @@
+<style>
+    /* Custom CSS for the auto-fit carousel */
+    .carousel-container {
+      max-width: 800px; /* Set the maximum width of the container */
+      margin: 0 auto; /* Center the container horizontally */
+    }
+
+    .carousel-slide {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Auto-fit columns with a minimum of 200px */
+      grid-gap: 10px; /* Add gap between grid items */
+    }
+
+    .carousel-image {
+      /* Ensure the image scales proportionally within the grid item */
+      width: 100%;
+      height: 0;
+      padding-bottom: 100%; /* 1:1 aspect ratio for square layout */
+      overflow: hidden;
+    }
+
+    .carousel-image img {
+      /* Scale the image to fit the grid item while preserving aspect ratio */
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .modal-dialog {
+        max-width: 70%; /* Adjust the maximum width as needed */
+      }
+  
+      .modal-content {
+        width: 100%;
+        text-align: center;
+      }
+  
+      #zoomedImage {
+        max-width: 100%;
+        max-height: 70vh; /* Adjust the maximum height as needed */
+        display: block;
+        margin: 0 auto; /* Center the image horizontally */
+      }
+  </style>

@@ -13,7 +13,7 @@ const App = () => {
     <RootLayout>
       <Routes>
         <Route path="/" element={<AllApps />} />
-        <Route path="/authentication" element={<Demo />} />
+        <Route path="/Demo" element={<Demo />} />
         <Route path="/stroage" element={<Stroage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/build/:bID" element={<Build />} />
