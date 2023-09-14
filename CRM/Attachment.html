@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Dynamic Carousel with API</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>Dynamic Carousel with API</h2>
+  <div id="myCarousel" class="carousel slide" data-ride="carousel">
+    <!-- Carousel Content Here -->
+    <div class="carousel-inner" id="carouselInner">
+      <!-- Images from API will be dynamically inserted here -->
+    </div>
+
+    <!-- Left and right controls -->
+    <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+      <span class="glyphicon glyphicon-chevron-left"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class="right carousel-control" href="#myCarousel" data-slide="next">
+      <span class="glyphicon glyphicon-chevron-right"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+</div>
+
+<!-- JavaScript to handle image loading from API -->
+<script>
+  // Function to fetch image URLs from API
+  async function fetchImageUrls() {
+    try {
+      const response = await fetch('API_URL'); // Replace with your API URL
+      const data = await response.json();
+      return data.urls; // Assuming the API response has a property "urls" containing the image URLs
+    } catch (error) {
+      console.error('Error fetching image URLs:', error);
+      return [];
+    }
+  }
+
+  // Function to dynamically load images from API
+  async function loadImages() {
+    const carouselInner = document.getElementById('carouselInner');
+    const imageUrls = await fetchImageUrls();
+
+    if (imageUrls && imageUrls.length > 0) {
+      carouselInner.innerHTML = ''; // Clear existing images
+
+      imageUrls.forEach((imageUrl, index) => {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = `Image ${index + 1}`;
+        img.style.width = '100%';
+        img.onclick = () => zoomImage(imageUrl);
+
+        const item = document.createElement('div');
+        item.classList.add('item');
+        if (index === 0) {
+          item.classList.add('active');
+        }
+        item.appendChild(img);
+
+        carouselInner.appendChild(item);
+      });
+    }
+  }
+
+  // Call the function to load images from API
+  loadImages();
+  
+  // Function to open the modal and display the zoomed image
+  function zoomImage(imageSrc) {
+    const zoomedImg = document.getElementById('zoomedImage');
+    zoomedImg.src = imageSrc;
+    $('#imageModal').modal('show'); // Open the modal
+  }
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</body>
+</html>

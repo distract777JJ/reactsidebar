@@ -26,7 +26,7 @@ export default function MyDatePicker() {
   );
 }
 
-export  function DynamicMaxDatePicker() {
+export  function DatePickerRange() {
     const [startDate, setStartDate] = useState(dayjs());
     const [endDate, setEndDate] = useState(dayjs());
   
