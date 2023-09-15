@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>购物清单</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    /* 添加表格边框 */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    /* 添加表格边框结束 */
+  </style>
+</head>
+<body>
+  <h2>购物清单</h2>
+
+  <!-- 第一个表格 -->
+  <table id="itemTable">
+    <thead>
+      <tr>
+        <th>产品</th>
+        <th>数量</th>
+        <th>单价</th>
+        <th>总价</th>
+        <th>  <button id="addRow">添加行</button></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 这里可以动态添加行 -->
+    </tbody>
+  </table>
+
+  <!-- 添加行按钮 -->
+
+
+  <br><br>
+
+ <!-- 初始化的总和表格 -->
+ <table id="totalTable">
+  <thead>
+    <th colspan="6" style="text-align: center;">總計</th>
+    
+    
+    </tr>
+  </thead>
+  <tbody>
+    <!-- 这里将显示每个产品的总和 -->
+  </tbody>
+</table>
+
+  <script>
+    $(document).ready(function() {
+
+  
+
+  // 获取所有产品的名称和值
+  var productOptions = [];
+
+  $(".product-select option").each(function() {
+    var productName = $(this).text();
+    var productValue = $(this).val();
+    productOptions.push({ name: productName, value: productValue });
+
+    // 初始化 totals 对象
+    totals[productValue] = 0;
+  });
+
+
+
+
+
+
+      // 在文档准备就绪时创建第一个行
+   
+      initializeTotalTable();
+           // 计算总和
+      createRow();
+      function calculateTotal() {
+  // 初始化 totals 对象
+  var totals = {};
+
+  $("#itemTable tbody tr").each(function() {
+    var productValue = $(this).find(".product-select").val();
+    var quantityInput = $(this).find("input[type='number']").eq(0).val();
+    var priceInput = $(this).find("input[type='number']").eq(1).val();
+
+    // 验证输入是否有效
+    if (!isNaN(quantityInput) && !isNaN(priceInput)) {
+      var quantity = parseFloat(quantityInput);
+      var price = parseFloat(priceInput);
+      var total = quantity * price;
+    } else {
+      // 处理输入无效的情况，可以给出警告或者默认值
+      var quantity = 0;
+      var price = 0;
+      var total = 0;
+    }
+
+    $(this).find("td").eq(3).text(total); // 第四列显示总价
+
+    // 在 totals 对象中减去之前产品的总价
+    if (!isNaN(quantityInput) && !isNaN(priceInput)) {
+      if (!totals[productValue]) {
+        totals[productValue] = 0;
+      }
+      totals[productValue] += total;
+    }
+  });
+
+   // 更新总和表格的值并初始化未出现的产品
+   $(".product-select option").each(function() {
+    var productValue = $(this).val();
+    if (!totals[productValue]) {
+      totals[productValue] = 0;
+    }
+    $("#" + productValue.toLowerCase() + "price").text(totals[productValue]);
+  });
+
+}
+
+
+
+      // 删除行
+      $("#itemTable").on("click", ".deleteRow", function() {
+        $(this).closest("tr").remove();
+        calculateTotal();
+      });
+
+      // 添加行
+      $("#addRow").click(function() {
+        var rowCount = $("#itemTable tbody tr").length + 1;
+        createRow(rowCount);
+
+        calculateTotal();
+      });
+
+
+      // 创建行的函数
+      function createRow(rowCount) {
+
+var productOptions = ["A", "B", "C", "D", "E"]; // 用于动态生成选项
+
+// 如果已经添加了所有选项，禁用添加行按钮
+if (rowCount > productOptions.length) {
+  $(this).prop("disabled", true);
+  return;
+}
+
+// 添加新行
+$("#itemTable tbody").append(`
+  <tr>
+    <td>
+    
+      <select class="product-select" id="product${rowCount}">
+        ${productOptions.map(option => `<option value="${option}">${option}产品</option>`).join('')}
+      </select>
+    </td>
+    <td>
+    
+      <input type="number" id="quantity${rowCount}" value="1">
+    </td>
+    <td>
+    
+      <input type="number" id="price${rowCount}" value="0">
+    </td>
+    <td>0</td>
+    <td><button class="deleteRow">删除</button></td>
+  </tr>
+`);
+
+// 在新行上绑定change事件
+$(`#product${rowCount}, #quantity${rowCount}, #price${rowCount}`).on("change", function() {
+calculateTotal();
+});
+}
+
+    });
+
+
+
+        // // 在新行上绑定change事件
+        // $(`#product${rowCount}, #quantity${rowCount}, #price${rowCount}`).on("change", function() {
+        //   calculateTotal();
+        // });
+
+        // 计算总和
+
+    
+
+          // 初始化总和表格
+       
+// 初始化总和表格
+function initializeTotalTable() {
+        var totalTableBody = $("#totalTable tbody");
+        totalTableBody.empty();
+
+        var productOptions = ["A", "B", "C", "D", "E"]; // 用于动态生成选项
+        var rowCount = 0;
+
+        productOptions.forEach(function(option) {
+          if (rowCount % 3 === 0) {
+            totalTableBody.append("<tr>");
+          }
+
+          totalTableBody.append(`
+            <td>${option}产品</td>
+            <td id="${option.toLowerCase()}price">0</td>
+          `);
+
+          rowCount++;
+
+          if (rowCount % 3 === 0) {
+            totalTableBody.append("</tr>");
+          }
+        });
+      }
+
+
+
+  </script>
+</body>
+</html>
