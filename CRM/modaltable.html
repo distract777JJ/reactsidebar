@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bootstrap模态框中的表格示例</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+    打开模态框
+  </button>
+
+  <!-- 模态框 -->
+  <div class="modal" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+          <h4 class="modal-title">表格示例</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- 模态框主体 -->
+        <div class="modal-body">
+            <table class="table" id="currtable">
+                <thead>
+                  <tr>
+                    <th>币别</th>
+                    <th>汇率</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>USD</td>
+                    <td><input type="number" value="1"></td>
+                  </tr>
+                  <tr>
+                    <td>TWD</td>
+                    <td><input type="number" value="30"></td>
+                  </tr>
+                </tbody>
+              </table>
+          <button type="button" class="btn btn-success" id="curraddRow">新增行</button>
+        </div>
+
+        <!-- 模态框底部 -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="confirmChanges">确认</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <table class="table" id="paymentdetail">
+    <thead>
+      <tr>
+        <th>费用项目</th>
+        <th>币别</th>
+        <th>金额</th>
+        <th>汇率</th>
+        <th>付款金额</th>
+        <th>  <button type="button" class="btn btn-success" id="addRow">添加行</button></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <select>
+            <option>项目1</option>
+            <option>项目2</option>
+          </select>
+        </td>
+        <td>
+          <select class="currency-select">
+            <option value="USD">USD</option>
+            <option value="TWD">TWD</option>
+          </select>
+        </td>
+        <td><input type="number" class="amount" value="100"></td>
+        <td><input type="number" class="exchange-rate" readonly></td>
+        <td><input type="number" class="payment-amount" readonly></td>
+        <td><button type="button" class="btn btn-danger delete-row">删除</button></td>
+      </tr>
+      <!-- 可以添加更多行 -->
+    </tbody>
+  </table>
+
+
+
+<!-- 提交按钮 -->
+<button type="button" class="btn btn-primary" id="submitData">提</button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+
+
+
+    // 当币别选择框的值发生变化或金额字段的值发生变化时，重新计算付款金额
+    $("#paymentdetail").on("input change", ".currency-select, .amount", function() {
+      calculatePaymentAmount($(this).closest("tr"));
+    });
+
+
+
+    $("#addRow").click(function() {
+      // 复制第一行并添加到表格
+      var newRow = $("#paymentdetail tbody tr:first").clone();
+      $("#paymentdetail tbody").append(newRow);
+      // 清空新增行的输入值
+      newRow.find("input").val("");
+      newRow.find(".exchange-rate").val("");
+      newRow.find(".payment-amount").val("");
+      newRow.find(".delete-row").click(function() {
+        $(this).closest("tr").remove();
+      });
+    });
+
+    // 删除行按钮点击事件
+    $("#paymentdetail").on("click", ".delete-row", function() {
+      $(this).closest("tr").remove();
+    });
+
+
+
+
+
+
+
+
+    // 新增行按钮点击事件
+    $("#curraddRow").click(function() {
+      // 创建新行
+      var newRow = $("<tr>");
+      newRow.append('<td><input type="text" class="form-control"></td>');
+      newRow.append('<td><input type="text" class="form-control"></td>');
+      newRow.append('<td><button type="button" class="btn btn-danger deleteRow">删除</button></td>');
+
+      // 将新行添加到表格中
+      $("#currtable tbody").append(newRow);
+    });
+
+    // 删除行按钮点击事件
+    $("#currtable").on("click", ".deleteRow", function() {
+      $(this).closest("tr").remove();
+    });
+
+    var originalRates = {}; // 用于存储模态框内表格的原始汇率数值
+var modified = false; // 标记是否有输入或选择元素的值发生变化
+
+// 监听模态框内输入和选择元素的变化
+$("#currtable").on("input change", "input[type='number']", function () {
+  var currency = $(this).closest("tr").find("td:eq(0)").text();
+  originalRates[currency] = parseFloat($(this).closest("tr").find("td:eq(1)").text());
+  modified = true; // 标记值发生变化
+});
+
+// 监听模态框关闭前的事件
+$("#myModal").on("hide.bs.modal", function (e) {
+  // 如果值发生变化，弹出确认对话框
+  if (modified) {
+    var confirmed = confirm("您尚未儲存，確定要離開吗？");
+
+    if (confirmed) {
+        modified = false; // 用户确认离开，重置标记
+      // 还原更改的汇率数值
+      restoreExchangeRate();
+    } else {
+      e.preventDefault(); // 阻止模态框关闭
+   //   modified = false; // 用户确认离开，重置标记
+    }
+  }
+});
+
+
+
+
+    // 监听确认按钮点击事件
+$("#confirmChanges").click(function () {
+  var modified = false; // 标记是否有输入或选择元素的值发生变化
+
+  // 检查模态框内输入和选择元素的值是否发生变化
+  $("#currtable tbody tr").each(function () {
+    var currency = $(this).find("td:eq(0)").text();
+    var input = $(this).find("input[type='number']");
+    var currentValue = parseFloat(input.val());
+
+    if (originalRates[currency] !== currentValue) {
+      modified = true; // 至少有一个元素的值发生了变化
+      originalRates[currency] = currentValue; // 更新原始值
+    }
+  });
+
+  // 如果有元素的值发生变化，弹出确认对话框
+  if (modified) {
+    var confirmed = confirm("更改匯率表後，現有費用資料將刪除，確認執行?");
+
+    if (confirmed) {
+      // 用户点击确认，执行更新操作，可以在这里执行更新模态框内表格的操作
+      // 更新完成后关闭模态框
+      $("#myModal").modal('hide');
+
+      // 弹出确认信息
+      alert("更新已确认，模态框已关闭");
+    } else {
+      // 用户点击取消，还原模态框内表格的数值
+      restoreExchangeRate();
+    }
+  }
+});
+
+
+// 还原更改的汇率数值
+function restoreExchangeRate() {
+  // 获取模态框内表格的原始汇率数值
+  var originalRates = {};
+  $("#currtable tbody tr").each(function () {
+    var currency = $(this).find("td:eq(0)").text();
+    var originalRate = parseFloat($(this).find("td:eq(1) input").data("original-rate"));
+    originalRates[currency] = originalRate;
+  });
+
+  // 更新模态框内表格的数值
+  $("#currtable tbody tr").each(function () {
+    var currency = $(this).find("td:eq(0)").text();
+    var input = $(this).find("td:eq(1) input");
+    input.val(originalRates[currency]);
+  });
+}
+
+
+
+
+
+
+    // 提交按钮点击事件
+    $("#submitData").click(function() {
+      // 创建一个空的JSON数组来存储表格数据
+      var paymentDetailData = tableDataToJson("#paymentdetail tbody tr", ["费用项目", "币别", "金额", "汇率", "付款金额"]);
+      var currTableData = tableDataToJson("#currtable tbody tr", ["币别", "汇率"]);
+      
+      console.log("外层表格数据:");
+      console.log(paymentDetailJsonString);
+      
+      console.log("模态框内表格数据:");
+      console.log(currTableJsonString);
+    });
+
+ // 计算付款金额并更新表格
+ function calculatePaymentAmount(row) {
+      var selectedCurrency = row.find(".currency-select").val();
+      var exchangeRate = $("#currtable tbody tr:has(td:contains(" + selectedCurrency + ")) input").val();
+      var amount = parseFloat(row.find(".amount").val());
+      var paymentAmount = amount * exchangeRate;
+      row.find(".exchange-rate").val(exchangeRate);
+      row.find(".payment-amount").val(paymentAmount.toFixed(2));
+    }
+
+
+
+
+ // 将表格数据转换为JSON
+ function tableDataToJson(tableSelector, columnNames) {
+      var data = [];
+      $(tableSelector).each(function() {
+        var row = $(this);
+        var rowData = {};
+        columnNames.forEach(function(columnName, index) {
+          rowData[columnName] = index === 1 ? row.find("td:eq(" + index + ") select").val() : parseFloat(row.find("td:eq(" + index + ") input").val());
+        });
+        data.push(rowData);
+      });
+      return data;
+    }
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>
