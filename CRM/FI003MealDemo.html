@@ -185,6 +185,7 @@
   <script>
 
 
+
 $("#addMealToPayment").on("click", () => {
   const mealRows = $("#MealDetail tbody tr");
   const selectedDates = [];
@@ -313,7 +314,18 @@ $("#uncheckAll").on("click", function () {
 });
 
 
-
+// 添加事件监听器以检测mealdetail表格中元素的更改
+$("#MealDetail").on("change", "input, select", function () {
+  // 在这里执行必要的逻辑
+  // 例如，检查并删除paymentdetail中的行
+  $("#paymentdetail tbody tr").each((index, row) => {
+    const $row = $(row);
+    const category = $row.find("select.category option:selected").text();
+    if (category === "膳食費") {
+      $row.remove();
+    }
+  });
+});
 
 
 
