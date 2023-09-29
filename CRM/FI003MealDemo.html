@@ -94,27 +94,32 @@
 <hr>
 <div>
 
-  <table class="table" id="MealDetail">
+  <table class="table" id="Mealdetail">
+    <div><button type="button" class="btn btn-success" id="addMealdetailRow">添加行</button>
+      <button type="button" class="btn btn-danger" id="DeleteMealdetailRow" disabled >刪除行</button>
+      </div>
     <thead>
       <tr>
+        <th style="width:100px;"><input type="checkbox"  id="checkallMealdetail"></th>
+        <th>No.</th>
         <th>日期</th>
         <th>地區</th>
         <th>幣別</th>
         <th>早餐</th>
-        <th>金额</th>
+        <th>金額</th>
         <th>午餐</th>
-        <th>金额</th>
+        <th>金額</th>
         <th>晚餐</th>
-        <th>金额</th>
+        <th>金額</th>
         <th>說明</th>
-        <th>  <button type="button" class="btn btn-success" id="addmealRow">添加行</button></th>
+    
       </tr>
     </thead>
+    <tbody>
+    </tbody>
+  <!-- <tr > -->
 
-
-  <tr >
-
-    <td><input type="text"  value="2023/9/1"></td>
+    <!-- <td><input type="text"  value="2023/9/1"></td>
     <td>
        <select class="region">
       <option value=0>CHINA</option>
@@ -133,28 +138,25 @@
     <td><input type="number" name="noonAmount" value="10"></td>
     <td><input type="checkbox" name="afternoon" checked></td>
     <td><input type="number" name="afternoonAmount" value="15"></td>
-    <td><textarea name="description"></textarea></td>
-    <td><button type="button" class="btn btn-danger delete-row">删除</button></td>
-  </tr>
-    <tfoot>
-      <tr> <td colspan="1"> <!-- 列数要根据你的表格列数来设置 -->
-        <button type="button" class="btn btn-primary" id="checkAll">Check All</button>
-        <button type="button"  class="btn btn-primary"  id="uncheckAll">Uncheck All</button>
-        <td>
-          <td align="center" colspan="7" ><!-- 列数要根据你的表格列数来设置 -->
-          <button type="button" class="btn btn-primary" id="addMealToPayment">OK</button>
-         
-        </td>
-      </tr>
-    </tfoot>
+    <td><textarea name="description"></textarea></td> -->
 
+  <!-- </tr> -->
+
+
+   </table>
+   <div>
+   
+    <button type="button" class="btn btn-primary" id="checkAll">Check All</button>
+    <button type="button"  class="btn btn-primary"  id="uncheckAll">Uncheck All</button>
  
-
+    <!-- <td align="center" colspan="7" >列数要根据你的表格列数来设置 -->
+    <button type="button" class="btn btn-primary" id="addMealDeailToPayment">OK</button>
+    </div>
 
   </div>
 
 <!-- 提交按钮 -->
-<button type="button" class="btn btn-primary" id="submitData">submit</button>
+<!-- <button type="button" class="btn btn-primary" id="submitData">submit</button> -->
 
 
 
@@ -170,45 +172,59 @@
 
 
 
-$("#addMealToPayment").on("click", () => {
-  const mealRows = $("#MealDetail tbody tr");
+ //detailtable addrow and delete row event
+ TableSchemaHandling("Paymentdetail","PaymentDetailRow");
+ TableActionHandling("Paymentdetail");
+
+
+ TableSchemaHandling("Mealdetail","MealDetailRow");
+ TableActionHandling("Mealdetail");
+
+
+
+$("#addMealDeailToPayment").on("click", () => {
+  const mealRows = $("#Mealdetail tbody tr");
   const selectedDates = [];
+ // const NewRowList = [];
  // 用对象来分组，以地区和幣別为键
  const groupedData = {};
  let hasDuplicateDate = false; // 用于跟踪是否有重复日期
 // 时删除PaymentDetail中的特定費用項目膳食費的数据
-  $("#paymentdetail tbody tr").each((index, row) => {
+  $("#Paymentdetail tbody tr").each((index, row) => {
     const $row = $(row);
-    const category = $row.find("select.category option:selected").text();
+    const category = $row.find("select.Category option:selected").text();
     if (category === "膳食費") {
       $row.remove();
     }
   });
 
-
+  let uniqueIndex = 1;
   mealRows.each((index, row) => {
     const $row = $(row);
-    const selectedRegion = $row.find("select.region option:selected").val();
-    const selectedCurrency = $row.find("select.currency-select option:selected").val();
-    const startDate = new Date($row.find("input[type=text]").eq(0).val());
+    const selectedRegion = $row.find("select.MealRegion option:selected").val();
+    const selectedCurrency = $row.find("select.MealCurrency option:selected").val();
+    const startDate = new Date($row.find("input[type=date]").val());
     if (selectedDates.includes(startDate.toLocaleDateString())) {
       alert("日期重複！");
       hasDuplicateDate = true;
       return false;
     }
+   
     const key = selectedRegion + "_" + selectedCurrency;
     
     if (!groupedData[key]) {
       groupedData[key] = {
+        index:uniqueIndex++,
         category: "1",
         startDate: startDate,
         endDate: startDate,
         currency: selectedCurrency,
-        amount: 0,
-        exchangeRate: 1,
-        paymentAmount: 0,
-        region: selectedRegion,
+        AmountWithoutTax: 0,
+        ExchangeRate: 1,
+        TotalAmount: 0,
+        Region: selectedRegion,
       };
+
     } else {
       // 更新日期範圍
       if (startDate < groupedData[key].startDate) {
@@ -219,24 +235,22 @@ $("#addMealToPayment").on("click", () => {
       }
     }
    // 获取morning checkbox的状态
-    const isMorningChecked = $row.find("input[name=morning]").is(":checked");
-    const isNoonChecked = $row.find("input[name=noon]").is(":checked");
-    const isAfternoonChecked = $row.find("input[name=afternoon]").is(":checked");
+    const isMorningChecked = $row.find("input[name=breakfast]").is(":checked");
+    const isNoonChecked = $row.find("input[name=Lunch]").is(":checked");
+    const isAfternoonChecked = $row.find("input[name=Dinner]").is(":checked");
 
     // 更新金額
-    const morningAmount = isMorningChecked? parseFloat($row.find("input[name=morningAmount]").val()) || 0 :0;
-    const noonAmount = isNoonChecked? parseFloat($row.find("input[name=noonAmount]").val()) || 0:0;
-    const afternoonAmount = isAfternoonChecked?parseFloat($row.find("input[name=afternoonAmount]").val()) || 0:0;
+    const morningAmount = isMorningChecked? parseFloat($row.find("input[name=breakfastAmt]").val()) || 0 :0;
+    const noonAmount = isNoonChecked? parseFloat($row.find("input[name=LunchAmt]").val()) || 0:0;
+    const afternoonAmount = isAfternoonChecked?parseFloat($row.find("input[name=DinnerAmt]").val()) || 0:0;
    // 遍历currtable查找对应的MRate
-    groupedData[key].exchangeRate=findExchangeRate(selectedCurrency);
-    groupedData[key].amount += (morningAmount + noonAmount + afternoonAmount);
-    groupedData[key].paymentAmount += (morningAmount + noonAmount + afternoonAmount)*groupedData[key].exchangeRate;
-
-
-
+    groupedData[key].ExchangeRate=findExchangeRate(selectedCurrency);
+    groupedData[key].AmountWithoutTax += (morningAmount + noonAmount + afternoonAmount);
+    groupedData[key].TotalAmount += (morningAmount + noonAmount + afternoonAmount)*groupedData[key].ExchangeRate;
 
 
     selectedDates.push(startDate.toLocaleDateString());
+   
   });
   
   if (hasDuplicateDate) {
@@ -245,24 +259,25 @@ $("#addMealToPayment").on("click", () => {
 
 
   // 將分組的數據添加到paymentdetail中
-  for (const key in groupedData) {
-    const newRow = $("<tr>");
-    newRow.append($("#paymentdetail tbody tr:first td").clone());
+  // for (const key in groupedData) {
+  //   const newRow = $("<tr>");
+  //   newRow.append($("#Paymentdetail tbody tr:first td").clone());
 
-    newRow.find("td:eq(0)").find("select").val(groupedData[key].category);
-    newRow.find("td:eq(1)").find("input").val(groupedData[key].startDate.toLocaleDateString());
-    newRow.find("td:eq(2)").find("input").val(groupedData[key].endDate.toLocaleDateString());
-    newRow.find("td:eq(3)").find("select").val(groupedData[key].currency);
-    newRow.find("td:eq(4)").find("input").val(groupedData[key].amount);
-    newRow.find("td:eq(5)").find("input").val(groupedData[key].exchangeRate);
-    newRow.find("td:eq(6)").find("input").val(groupedData[key].paymentAmount);
-    newRow.find("td:eq(7)").find("select").val(groupedData[key].region);
+  //   newRow.find("td:eq(0)").find("select").val(groupedData[key].category);
+  //   newRow.find("td:eq(1)").find("input").val(groupedData[key].startDate.toLocaleDateString());
+  //   newRow.find("td:eq(2)").find("input").val(groupedData[key].endDate.toLocaleDateString());
+  //   newRow.find("td:eq(3)").find("select").val(groupedData[key].currency);
+  //   newRow.find("td:eq(4)").find("input").val(groupedData[key].amount);
+  //   newRow.find("td:eq(5)").find("input").val(groupedData[key].exchangeRate);
+  //   newRow.find("td:eq(6)").find("input").val(groupedData[key].paymentAmount);
+  //   newRow.find("td:eq(7)").find("select").val(groupedData[key].region);
 
-    // const deleteButton = $("<button>").attr("type", "button").addClass("btn btn-danger delete-row").text("删除");
-    // newRow.append($("<td>").append(deleteButton));
+  //   // const deleteButton = $("<button>").attr("type", "button").addClass("btn btn-danger delete-row").text("删除");
+  //    newRow.append(NewRowList);
 
-    $("#paymentdetail tbody").append(newRow);
-  }
+   
+  // }
+    LoadDatatoTable("Paymentdetail","PaymentDetailRow",groupedData);
 
 
 });
@@ -291,88 +306,13 @@ function findExchangeRate(selectedCurrency) {
 
 // 检查Meal Detail表格中的所有复选框
 $("#checkAll").on("click", function () {
-  $("#MealDetail tbody input[type=checkbox]").prop("checked", true);
+  $("#Mealdetail tbody tr td:not(:first-child) input[type=checkbox]").prop("checked", true);
 });
 
 // 取消检查Meal Detail表格中的所有复选框
 $("#uncheckAll").on("click", function () {
-  $("#MealDetail tbody input[type=checkbox]").prop("checked", false);
+  $("#Mealdetail tbody tr td:not(:first-child) input[type=checkbox]").prop("checked", false);
 });
-
-
-// 添加事件监听器以检测mealdetail表格中元素的更改
-$("#MealDetail").on("change", "input, select", function () {
-  // 在这里执行必要的逻辑
-  // 例如，检查并删除paymentdetail中的行
-  $("#paymentdetail tbody tr").each((index, row) => {
-    const $row = $(row);
-    const category = $row.find("select.category option:selected").text();
-    if (category === "膳食費") {
-      $row.remove();
-    }
-  });
-});
-
-
-
-
-    // 当币别选择框的值发生变化或金额字段的值发生变化时，重新计算付款金额
-    $("#paymentdetail").on("input change", ".currency-select, .amount", function() {
-      calculatePaymentAmount($(this).closest("tr"));
-    });
-   
-    //paymentdetail 端處理
-    // 整批點選
-    $("#checkallPaymentdetail").on("click", function () {
-      $(this).is(":checked")?
-      $("#Paymentdetail tbody input[type=checkbox]").prop("checked", true)
-      :
-      $("#Paymentdetail tbody input[type=checkbox]").prop("checked", false);
-    });
-
-    
-    AddTableActionHandling("Paymentdetail","PaymentDetailRow");
-
-    //deleterow handling
-    DeleteTableActionHandling("Paymentdetail");
-    // 删除行按鈕事件部分
-    // TableID="Paymentdetail";
-    // //DeletePaymentdetailRow
-    // //DeletePaymentdetailRow
-    // $("#Delete"+TableID+"Row").click(function() {
-    //   $("#"+TableID +" tbody tr").each((index, row) => {
-    //   const $row = $(row);
-    //   // Check if the checkbox is checked
-    //   const isChecked =$row .find("input[type='checkbox']").prop("checked");
-    //   if (isChecked)
-    //   {$row.remove();
-    //    $("#checkall"+TableID).prop("checked",false);
-    //    $("#Delete"+TableID+"Row").prop('disabled', true);
-    //   } 
-    // });
-    // });
-
-
-
-
-
-    $("#addmealRow").click(function() {
-      // 复制第一行并添加到表格
-      var newRow = $("#MealDetail tbody tr:first").clone();
-      $("#MealDetail tbody").append(newRow);
-      // 清空新增行的输入值
-     
-     
-      newRow.find(".delete-row").click(function() {
-        $(this).closest("tr").remove();
-      });
-    });
-
-    // 删除行按钮点击事件
-    $("#MealDetail").on("click", ".delete-row", function() {
-      $(this).closest("tr").remove();
-    });
-
 
 
 
@@ -497,15 +437,7 @@ function restoreExchangeRate() {
       console.log(currTableJsonString);
     });
 
- // 计算付款金额并更新表格
- function calculatePaymentAmount(row) {
-      var selectedCurrency = row.find(".currency-select").val();
-      var exchangeRate = $("#currtable tbody tr:has(td:contains(" + selectedCurrency + ")) input").val();
-      var amount = parseFloat(row.find(".amount").val());
-      var paymentAmount = amount * exchangeRate;
-      row.find(".exchange-rate").val(exchangeRate);
-      row.find(".payment-amount").val(paymentAmount.toFixed(2));
-    }
+
 
 
 
@@ -527,11 +459,13 @@ function restoreExchangeRate() {
 
 
 
-    //通用add row 
-function AddTableActionHandling(TableID,className)
+    //通用建立Table資料結構及action 
+function TableSchemaHandling(TableID,className)
 {
     //add row handling
     $("#add"+TableID+"Row").click(function() {
+
+      console.log(TableID+','+className);
     let maxIndex = 0;
     $("#"+TableID+" tbody tr").each(function () {
       const currentIndex = parseInt($(this).find("td:eq(1)").text(), 10);
@@ -541,7 +475,7 @@ function AddTableActionHandling(TableID,className)
     });
     // 在页面加载时创建一些初始的<tr>元素，并将它们添加到tableRows数组中
     const tableBody = $("#"+TableID+" tbody");
-    
+    //console.log(maxIndex);
       // Dynamically create an instance of the specified class
       const tableRow = new TableRowFactory.createTableRow(maxIndex + 1,className);
      // tableRows.push(tableRow);
@@ -550,10 +484,8 @@ function AddTableActionHandling(TableID,className)
     });
 }
 
-
-
-   //通用delete row
-  function DeleteTableActionHandling(TableID)
+   //通用資料操作
+  function TableActionHandling(TableID)
   
   {
     // 删除行按鈕事件部分
@@ -574,13 +506,34 @@ function AddTableActionHandling(TableID,className)
       } 
     });
   });
-
-
+  
+    // 整批點選
+  
+    $("#checkall"+TableID).on("click", function () {
+      $(this).is(":checked")?
+      $("#"+TableID +" tbody td:first-child input[type=checkbox]").prop("checked", true)
+      :
+      $("#"+TableID +" tbody td:first-child input[type=checkbox]").prop("checked", false);
+    });
 
   }
 
+  
+//load json to create data
 
+function LoadDatatoTable(TableID,ClassName,data)
+{
+  const tableBody = document.getElementById(TableID).querySelector('tbody'); 
+for (const key in data) {
+  if (Object.hasOwnProperty.call(data, key)) {
+    const rowData = data[key];
+    const index = rowData.index; ; // Extract the index from the key
+    const row = TableRowFactory.createTableRow(index, ClassName, rowData);
+    tableBody.appendChild(row.tr);
+  }
+}
 
+}
 
 
 
