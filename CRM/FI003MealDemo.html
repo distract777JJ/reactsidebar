@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="FI003_TableRowFactory.js"></script>
+  <script src="common.js"></script>
 </head>
 
 
@@ -151,6 +152,7 @@
  
     <!-- <td align="center" colspan="7" >列数要根据你的表格列数来设置 -->
     <button type="button" class="btn btn-primary" id="addMealDeailToPayment">OK</button>
+    <button type="button" class="btn btn-primary" id="submitData">submitData</button>
     </div>
 
   </div>
@@ -258,25 +260,6 @@ $("#addMealDeailToPayment").on("click", () => {
   }
 
 
-  // 將分組的數據添加到paymentdetail中
-  // for (const key in groupedData) {
-  //   const newRow = $("<tr>");
-  //   newRow.append($("#Paymentdetail tbody tr:first td").clone());
-
-  //   newRow.find("td:eq(0)").find("select").val(groupedData[key].category);
-  //   newRow.find("td:eq(1)").find("input").val(groupedData[key].startDate.toLocaleDateString());
-  //   newRow.find("td:eq(2)").find("input").val(groupedData[key].endDate.toLocaleDateString());
-  //   newRow.find("td:eq(3)").find("select").val(groupedData[key].currency);
-  //   newRow.find("td:eq(4)").find("input").val(groupedData[key].amount);
-  //   newRow.find("td:eq(5)").find("input").val(groupedData[key].exchangeRate);
-  //   newRow.find("td:eq(6)").find("input").val(groupedData[key].paymentAmount);
-  //   newRow.find("td:eq(7)").find("select").val(groupedData[key].region);
-
-  //   // const deleteButton = $("<button>").attr("type", "button").addClass("btn btn-danger delete-row").text("删除");
-  //    newRow.append(NewRowList);
-
-   
-  // }
     LoadDatatoTable("Paymentdetail","PaymentDetailRow",groupedData);
 
 
@@ -427,34 +410,30 @@ function restoreExchangeRate() {
     // 提交按钮点击事件
     $("#submitData").click(function() {
       // 创建一个空的JSON数组来存储表格数据
-      var paymentDetailData = tableDataToJson("#paymentdetail tbody tr", ["费用项目", "币别", "金额", "汇率", "付款金额"]);
-      var currTableData = tableDataToJson("#currtable tbody tr", ["币别", "汇率"]);
-      
-      console.log("外层表格数据:");
-      console.log(paymentDetailJsonString);
-      
-      console.log("模态框内表格数据:");
-      console.log(currTableJsonString);
+   
+   
+      const mealDetailConfig = {
+    id: { selector: 'input.SerialNo', transform: parseInt },
+    date: { selector: 'input.MealDate' },
+    region: { selector: 'select.MealRegion' },
+    currency: { selector: 'select.MealCurrency' },
+    breakfastF: { selector: 'input.breakfast', transform: Boolean },
+    breakfastA: { selector: 'input.BreakfastAmt', transform: parseFloat },
+    LunchF: { selector: 'input.Lunch', transform: Boolean },
+    LunchA: { selector: 'input.LunchAmt', transform: parseFloat },
+    DinneF: { selector: 'input.Dinner', transform: Boolean },
+    aftDinnerA: { selector: 'input.DinnerAmt', transform: parseFloat },
+    desc: { selector: 'textarea.Description' },
+  };
+  
+  const mealDetailJSON = convertTableToJSON('#Mealdetail', mealDetailConfig);
+  console.log(mealDetailJSON);
+
+
+
     });
 
 
-
-
-
-
- // 将表格数据转换为JSON
- function tableDataToJson(tableSelector, columnNames) {
-      var data = [];
-      $(tableSelector).each(function() {
-        var row = $(this);
-        var rowData = {};
-        columnNames.forEach(function(columnName, index) {
-          rowData[columnName] = index === 1 ? row.find("td:eq(" + index + ") select").val() : parseFloat(row.find("td:eq(" + index + ") input").val());
-        });
-        data.push(rowData);
-      });
-      return data;
-    }
 
 
 
@@ -468,7 +447,7 @@ function TableSchemaHandling(TableID,className)
       console.log(TableID+','+className);
     let maxIndex = 0;
     $("#"+TableID+" tbody tr").each(function () {
-      const currentIndex = parseInt($(this).find("td:eq(1)").text(), 10);
+      const currentIndex = parseInt($(this).find("td:eq(1) input").val(), 10);
       if (!isNaN(currentIndex) && currentIndex > maxIndex) {
         maxIndex = currentIndex;
       }

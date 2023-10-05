@@ -37,7 +37,7 @@ class PaymentDetailRow {
     const tr = document.createElement("tr");
     tr.innerHTML = `
         <td><input type="checkbox"></td>
-        <td>${this.index}</td>
+        <td><input type="text" name="SerialNo" class="SerialNo" value="${this.index}" readonly></td>
         <td>
           <select class="Category">
             <option value="0">旅費</option>
@@ -194,7 +194,7 @@ class MealDetailRow {
     const tr = document.createElement("tr");
     tr.innerHTML = `
         <td><input type="checkbox"></td>
-        <td>${this.index}</td>
+        <td><input type="text" name="SerialNo" class="SerialNo" value="${this.index}" readonly></td>
         <td>
         <input type="date" class="MealDate"></td>
         <td>
