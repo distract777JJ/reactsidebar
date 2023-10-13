@@ -67,10 +67,19 @@
       </div>
     </div>
   </div>
+<table class="table" id="Totaltable">
+  <thead>
+  </thead>
+  <tbody></tbody>
+  </table><table>
+
+
+
 
   <table class="table" id="Paymentdetail">
     <div><button type="button" class="btn btn-success" id="addPaymentdetailRow">添加行</button>
     <button type="button" class="btn btn-danger" id="DeletePaymentdetailRow" disabled >刪除行</button>
+    <button type="button" class="btn btn-primary" id="SumbitToTotalTable" onclick="createtotaltable()" >顯示總和</button>
     </div>
       <thead>
       <tr>
@@ -181,6 +190,7 @@
 
  TableSchemaHandling("Mealdetail","MealDetailRow");
  TableActionHandling("Mealdetail");
+
 
 
 
@@ -513,6 +523,78 @@ for (const key in data) {
 }
 
 }
+
+function createtotaltable()
+{
+  const tableHead = $("#Totaltable thead");
+  const tableBody = $("#Totaltable tbody");
+
+  tableHead.empty();
+  tableBody.empty();
+  var totals = {};
+  $("#Paymentdetail tbody tr").each(function () {
+            var Category = $(this).find("select.Category option:selected").text();
+            var TotalAmount = $(this).find("input.TotalAmount").val();
+         
+            // 验证输入是否有效
+            if (isNaN(TotalAmount)) {
+              TotalAmount=0;
+            }
+           
+                     // 在 totals 对象中减去之前产品的总价
+            if (!isNaN(TotalAmount)) {
+            
+              if (!totals[Category]) {
+                  totals[Category] = 0;
+              }
+              totals[Category] += parseFloat(TotalAmount);
+            }
+          });
+
+        
+ console.log(totals);
+
+
+
+  
+         var rowCount=1;
+            tableHead.append("<tr>");
+            tableBody.append("<tr>");
+
+
+
+        for (const category in totals) {
+          if (totals.hasOwnProperty(category)) {
+            const amount = totals[category];
+
+          
+
+            tableHead.append(`
+              <th style="text-align: center;">${category}</th>
+            `);
+            tableBody.append(`
+              <td style="text-align: right;">${formatNumber(amount)}</td>
+            `);
+
+          
+          }
+        }
+
+
+
+            tableHead.append("</tr>");
+            tableBody.append("</tr>");
+}
+
+
+
+function formatNumber(number) {
+  return number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
+
+
+
+
 
 
 

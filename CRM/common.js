@@ -23,20 +23,5 @@ function convertTableToJSON(tableSelector, config) {
   }
   
   // 使用示例
-  const mealDetailConfig = {
-    id: { selector: 'input.SerialNo', transform: parseInt },
-    date: { selector: 'input.MealDate' },
-    region: { selector: 'input.MealRegion' },
-    currency: { selector: 'input.MealCurrency' },
-    breakfastF: { selector: 'input.breakfast', transform: Boolean },
-    breakfastA: { selector: 'input.breakfastAmt', transform: parseFloat },
-    LunchF: { selector: 'input.Lunch', transform: Boolean },
-    LunchA: { selector: 'input.LunchAmt', transform: parseFloat },
-    DinneF: { selector: 'input.Dinner', transform: Boolean },
-    aftDinnerA: { selector: 'input.DinnerAmt', transform: parseFloat },
-    desc: { selector: 'textarea.description' },
-  };
-  
-  const mealDetailJSON = convertTableToJSON('#Mealdetail', mealDetailConfig);
-  console.log(mealDetailJSON);
+
   
