@@ -66,7 +66,8 @@ class PaymentDetailRow {
         </select>
         </td>
       `;
-
+      tr.setAttribute('role', 'row');
+      //tr.classList.add('tablesorter-hasChildRow');
       if(data)
     {  tr.querySelector(".Category").value = data.category;
       tr.querySelector(".DetailstartDate").valueAsDate = new Date(data.startDate);
@@ -84,7 +85,7 @@ class PaymentDetailRow {
  
     // Get all elements with the specified class names
     const classNames = ["Category", "DetailstartDate", "DetailEndtDate", "PCurrency", "AmountWithoutTax", "ExchangeRate", "TotalAmount", "Region"];
-
+   
     classNames.forEach(className => {
       const elements = tr.querySelectorAll("." + className);
       elements.forEach(element => {
@@ -115,7 +116,7 @@ class PaymentDetailRow {
         const amountWithoutTaxInput = tr.querySelector(".AmountWithoutTax");
         const quantityInput = tr.querySelector(".ExchangeRate");
         const totalAmountInput = tr.querySelector(".TotalAmount");
-  
+    
         // Retrieve values
         const amountWithoutTax = parseFloat(amountWithoutTaxInput.value);
         const quantity = parseFloat(quantityInput.value);

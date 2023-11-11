@@ -1,0 +1,19 @@
+.grid-container {
+    border: 1px solid #000; /* Add border to control_grid */
+    padding-inline: 5px; /* Add padding to control_grid */
+    
+  }
+  
+  .payment-heading {
+    background-color: #455abb; /* Add background color to the heading */
+    padding: 5px; /* Add padding to the heading */
+    font-weight: bold; /* Make the heading bold */
+    color: white; 
+  }
+  .buttons-container {
+    margin-top: 10px; /* Add margin to create space between heading and buttons */
+  }
+  .table {
+    border: 1px solid #000; /* Add border to the table */
+    width: 100%; /* Make the table width 100% */
+  }

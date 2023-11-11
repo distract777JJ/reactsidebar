@@ -9,6 +9,9 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="FI003_TableRowFactory.js"></script>
   <script src="common.js"></script>
+  <link rel="stylesheet" href="FI003.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.blue.min.css">
 </head>
 
 
@@ -75,12 +78,18 @@
 
 
 
+  
+  <div id="control_grid"  class="grid-container">
+    <div class="payment-heading">付款項目</div>
+    <div class="buttons-container">
+      
+      <button type="button" class="btn btn-success" id="addPaymentdetailRow">添加行</button>
+      <button type="button" class="btn btn-danger" id="DeletePaymentdetailRow" disabled >刪除行</button>
+      <button type="button" class="btn btn-primary" id="SumbitToTotalTable" onclick="createtotaltable()" >顯示總和</button>
+      </div>
+    
+  <table class="table tablesorter" id="Paymentdetail">
 
-  <table class="table" id="Paymentdetail">
-    <div><button type="button" class="btn btn-success" id="addPaymentdetailRow">添加行</button>
-    <button type="button" class="btn btn-danger" id="DeletePaymentdetailRow" disabled >刪除行</button>
-    <button type="button" class="btn btn-primary" id="SumbitToTotalTable" onclick="createtotaltable()" >顯示總和</button>
-    </div>
       <thead>
       <tr>
         <th><input type="checkbox"  id="checkallPaymentdetail"></th>
@@ -100,14 +109,20 @@
      
     </tbody>
   </table>
-
+  </div>
+  <br>
 <hr>
-<div>
+<br>
+
+<div class="grid-container" >
+  <div class="payment-heading">膳食費</div>
+  <div class="buttons-container"><button type="button" class="btn btn-success" id="addMealdetailRow">添加行</button>
+    <button type="button" class="btn btn-danger" id="DeleteMealdetailRow" disabled >刪除行</button>
+    </div>
+
 
   <table class="table" id="Mealdetail">
-    <div><button type="button" class="btn btn-success" id="addMealdetailRow">添加行</button>
-      <button type="button" class="btn btn-danger" id="DeleteMealdetailRow" disabled >刪除行</button>
-      </div>
+    
     <thead>
       <tr>
         <th style="width:100px;"><input type="checkbox"  id="checkallMealdetail"></th>
@@ -192,7 +207,50 @@
  TableActionHandling("Mealdetail");
 
 
+ // 定義一個parser，根據input value來排序
+//  $.tablesorter.addParser({
+//     id: "inputs",
+//     is: function() {
+//       return false;
+//     },
+//     format: function(s, table, cell) {
+//       return $(cell).find('input').val() || s;
+//     },
+//     type: "text"
+//   });
 
+$(document).ready(function () {
+    $.tablesorter.addParser({
+        id: 'input-value',
+        is: function (s, table, cell) {
+            // 判斷是否是包含 <input> 的列
+            return $(cell).find('input').length > 0;
+        },
+        format: function (s, table, cell) {
+            // 回傳 <input> 的值
+            return $(cell).find('input').val();
+        },
+        type: 'text'
+    });
+
+    $("#Paymentdetail").tablesorter({
+        headers: {
+            1: { sorter: 'input-value' }, // 對第二列的 <input> 元素的值進行排序
+            2: { sorter: 'input-value' }, // 對第二列的 <input> 元素的值進行排序
+            3: { sorter: 'input-value' }, // 對第二列的 <input> 元素的值進行排序
+            // 添加其他列的配置
+        }
+    });
+
+    $("#myTable").tablesorter({
+        headers: {
+            1: { sorter: 'input-value' }, // 對第二列的 <input> 元素的值進行排序
+            2: { sorter: 'input-value' }, // 對第二列的 <input> 元素的值進行排序
+            3: { sorter: 'input-value' }, // 對第二列的 <input> 元素的值進行排序
+            // 添加其他列的配置
+        }
+    });
+});
 
 $("#addMealDeailToPayment").on("click", () => {
   const mealRows = $("#Mealdetail tbody tr");
@@ -523,7 +581,15 @@ for (const key in data) {
 }
 
 }
+function renumberSerialNo() {
+    // 获取所有序号输入框
+    const serialNoInputs = $("#Paymentdetail tbody tr .SerialNo");
 
+    // 重新为每个输入框设置序号
+    serialNoInputs.each(function(index) {
+        $(this).val(index + 1);
+    });
+}
 function createtotaltable()
 {
   const tableHead = $("#Totaltable thead");
@@ -551,10 +617,15 @@ function createtotaltable()
             }
           });
 
-        
+          renumberSerialNo();
  console.log(totals);
 
 
+    var rows = document.getElementsByTagName("tr");
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].getElementsByTagName("td")[0].innerHTML = i + 1;
+    }
+  
 
   
          var rowCount=1;

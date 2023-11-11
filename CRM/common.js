@@ -1,7 +1,7 @@
 function convertTableToJSON(tableSelector, config) {
     const tableRows = $(tableSelector).find('tbody tr');
     const jsonData = [];
-  
+     tableRows.
     tableRows.each(function() {
       const rowData = {};
   
@@ -23,5 +23,6 @@ function convertTableToJSON(tableSelector, config) {
   }
   
   // 使用示例
+
 
   
